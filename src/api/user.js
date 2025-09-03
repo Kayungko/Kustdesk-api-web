@@ -97,3 +97,27 @@ export function register (data) {
     data,
   })
 }
+
+// 新增：设备管理相关API
+export function getUserDevices (userId) {
+  return request({
+    url: `/user/devices/${userId}`,
+    method: 'get',
+  })
+}
+
+export function forceLogoutDevice (data) {
+  return request({
+    url: '/user/forceLogoutDevice',
+    method: 'post',
+    data,
+  })
+}
+
+// 新增：获取用户最大并发设备数
+export function getUserMaxConcurrentDevices (userId) {
+  return request({
+    url: `/user/max-concurrent-devices/${userId}`,
+    method: 'get',
+  })
+}

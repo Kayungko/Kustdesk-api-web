@@ -32,6 +32,49 @@
                    :inactive-value="DISABLE_STATUS"
         ></el-switch>
       </el-form-item>
+
+      <!-- 新增：账户时间管理 -->
+      <el-form-item :label="T('AccountStartTime')" prop="account_start_time">
+        <el-date-picker
+          v-model="form.account_start_time"
+          type="datetime"
+          :placeholder="T('SelectStartTime')"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="YYYY-MM-DD HH:mm:ss"
+          clearable
+        />
+        <div class="form-tip">{{ T('AccountStartTimeTip') }}</div>
+      </el-form-item>
+
+      <el-form-item :label="T('AccountEndTime')" prop="account_end_time">
+        <el-date-picker
+          v-model="form.account_end_time"
+          type="datetime"
+          :placeholder="T('SelectEndTime')"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="YYYY-MM-DD HH:mm:ss"
+          clearable
+        />
+        <div class="form-tip">{{ T('AccountEndTimeTip') }}</div>
+      </el-form-item>
+
+      <!-- 新增：个人设备数量限制 -->
+      <el-form-item :label="T('MaxDevices')" prop="max_devices">
+        <el-input-number
+          v-model="form.max_devices"
+          :min="0"
+          :max="100"
+          :step="1"
+          :placeholder="T('UseGlobalSetting')"
+          clearable
+        />
+        <div class="form-tip">
+          {{ T('MaxDevicesTip') }}
+          <br/>
+          {{ T('MaxDevicesTip2') }}
+        </div>
+      </el-form-item>
+
       <el-form-item :label="T('Remark')" prop="remark">
           <el-input v-model="form.remark"></el-input>
       </el-form-item>

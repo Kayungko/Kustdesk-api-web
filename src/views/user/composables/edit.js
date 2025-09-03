@@ -7,7 +7,19 @@ import { T } from '@/utils/i18n'
 
 export function useGetDetail (id) {
   let item = ref({})  //保留原始值
-  let form = ref({})
+  let form = ref({
+    // 设置默认值，确保创建用户时有合理的初始状态
+    username: '',
+    email: '',
+    nickname: '',
+    group_id: undefined,
+    is_admin: false,
+    status: 1, // 默认启用状态
+    remark: '',
+    account_start_time: null,
+    account_end_time: null,
+    max_devices: null  // 新增：个人设备数量限制，null表示使用全局配置
+  })
   const groupsList = ref([])
   const getDetail = async (id) => {
     const res = await detail(id)
