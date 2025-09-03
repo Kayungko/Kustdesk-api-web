@@ -40,7 +40,7 @@
           type="datetime"
           :placeholder="T('SelectStartTime')"
           format="YYYY-MM-DD HH:mm:ss"
-          value-format="YYYY-MM-DD HH:mm:ss"
+          value-format="YYYY-MM-DDTHH:mm:ss.SSSZ"
           clearable
         />
         <div class="form-tip">{{ T('AccountStartTimeTip') }}</div>
@@ -52,7 +52,7 @@
           type="datetime"
           :placeholder="T('SelectEndTime')"
           format="YYYY-MM-DD HH:mm:ss"
-          value-format="YYYY-MM-DD HH:mm:ss"
+          value-format="YYYY-MM-DDTHH:mm:ss.SSSZ"
           clearable
         />
         <div class="form-tip">{{ T('AccountEndTimeTip') }}</div>

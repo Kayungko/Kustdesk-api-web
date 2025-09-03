@@ -21,10 +21,10 @@
           <!-- 设备管理配置 -->
           <el-divider content-position="left">
             <el-icon><Monitor /></el-icon>
-            设备管理配置
+            {{ T('DeviceManagementConfig') }}
           </el-divider>
           
-          <el-form-item label="最大并发设备数" prop="max_concurrent_devices">
+          <el-form-item :label="T('MaxConcurrentDevices')" prop="max_concurrent_devices">
             <el-input-number 
               v-model="configForm.max_concurrent_devices" 
               :min="0" 
@@ -33,40 +33,40 @@
               style="width: 200px;"
             />
             <div class="form-tip">
-              设置为 0 表示无限制，大于 0 表示每个用户最多可同时登录的设备数量
+              {{ T('MaxConcurrentDevicesTip') }}
             </div>
           </el-form-item>
           
           <!-- 注册配置 -->
           <el-divider content-position="left">
             <el-icon><UserFilled /></el-icon>
-            用户注册配置
+            {{ T('UserRegistrationConfig') }}
           </el-divider>
           
-          <el-form-item label="开启用户注册" prop="register">
+          <el-form-item :label="T('EnableUserRegistration')" prop="register">
             <el-switch v-model="configForm.register" />
             <div class="form-tip">
-              是否允许新用户注册账户
+              {{ T('EnableUserRegistrationTip') }}
             </div>
           </el-form-item>
           
-          <el-form-item label="注册用户默认状态" prop="register_status">
+          <el-form-item :label="T('DefaultRegistrationStatus')" prop="register_status">
             <el-select v-model="configForm.register_status" style="width: 200px;">
-              <el-option label="启用" :value="1" />
-              <el-option label="禁用" :value="2" />
+              <el-option :label="T('Enabled')" :value="1" />
+              <el-option :label="T('Disabled')" :value="2" />
             </el-select>
             <div class="form-tip">
-              新注册用户的默认状态
+              {{ T('DefaultRegistrationStatusTip') }}
             </div>
           </el-form-item>
           
           <!-- 安全配置 -->
           <el-divider content-position="left">
             <el-icon><Lock /></el-icon>
-            安全配置
+            {{ T('SecurityConfig') }}
           </el-divider>
           
-          <el-form-item label="验证码阈值" prop="captcha_threshold">
+          <el-form-item :label="T('CaptchaThreshold')" prop="captcha_threshold">
             <el-input-number 
               v-model="configForm.captcha_threshold" 
               :min="-1" 
@@ -75,11 +75,11 @@
               style="width: 200px;"
             />
             <div class="form-tip">
-              -1:禁用验证码, 0:总是显示, >0:失败次数达到阈值后显示
+              {{ T('CaptchaThresholdTip') }}
             </div>
           </el-form-item>
           
-          <el-form-item label="封禁阈值" prop="ban_threshold">
+          <el-form-item :label="T('BanThreshold')" prop="ban_threshold">
             <el-input-number 
               v-model="configForm.ban_threshold" 
               :min="0" 
@@ -88,54 +88,54 @@
               style="width: 200px;"
             />
             <div class="form-tip">
-              0:禁用封禁, >0:失败次数达到阈值后临时封禁IP
+              {{ T('BanThresholdTip') }}
             </div>
           </el-form-item>
           
-          <el-form-item label="禁用密码登录" prop="disable_pwd_login">
+          <el-form-item :label="T('DisablePasswordLogin')" prop="disable_pwd_login">
             <el-switch v-model="configForm.disable_pwd_login" />
             <div class="form-tip">
-              启用后只能通过OAuth登录
+              {{ T('DisablePasswordLoginTip') }}
             </div>
           </el-form-item>
           
           <!-- Web客户端配置 -->
           <el-divider content-position="left">
             <el-icon><Monitor /></el-icon>
-            Web客户端配置
+            {{ T('WebClientConfig') }}
           </el-divider>
           
-          <el-form-item label="启用Web客户端" prop="web_client">
+          <el-form-item :label="T('EnableWebClient')" prop="web_client">
             <el-select v-model="configForm.web_client" style="width: 200px;">
-              <el-option label="启用" :value="1" />
-              <el-option label="禁用" :value="0" />
+              <el-option :label="T('Enabled')" :value="1" />
+              <el-option :label="T('Disabled')" :value="0" />
             </el-select>
             <div class="form-tip">
-              是否启用Web客户端功能
+              {{ T('EnableWebClientTip') }}
             </div>
           </el-form-item>
           
-          <el-form-item label="Web单点登录" prop="web_sso">
+          <el-form-item :label="T('WebSSO')" prop="web_sso">
             <el-switch v-model="configForm.web_sso" />
             <div class="form-tip">
-              是否启用Web认证单点登录
+              {{ T('WebSSOTip') }}
             </div>
           </el-form-item>
           
           <!-- Token配置 -->
           <el-divider content-position="left">
             <el-icon><Ticket /></el-icon>
-            Token配置
+            {{ T('TokenConfig') }}
           </el-divider>
           
-          <el-form-item label="Token过期时间" prop="token_expire">
+          <el-form-item :label="T('TokenExpire')" prop="token_expire">
             <el-input 
               v-model="configForm.token_expire" 
               style="width: 200px;"
               placeholder="例如: 168h"
             />
             <div class="form-tip">
-              Token的有效期，格式：数字+单位(h=小时,m=分钟)，例如：168h
+              {{ T('TokenExpireTip') }}
             </div>
           </el-form-item>
         </el-form>
@@ -173,30 +173,30 @@ const loadConfig = async () => {
       Object.assign(configForm.value, res.data)
     }
   } catch (error) {
-    ElMessage.error('加载配置失败')
+    ElMessage.error(T('ConfigLoadFailed'))
   }
 }
 
 const saveConfig = async () => {
   if (saving.value) return
   
-  try {
+      try {
     await ElMessageBox.confirm(
-      '确认保存这些配置更改吗？某些配置可能需要重启服务后生效。',
-      '确认保存',
+      T('ConfigSaveConfirm'),
+      T('ConfigSaveTitle'),
       {
-        confirmButtonText: '保存',
-        cancelButtonText: '取消',
+        confirmButtonText: T('Save'),
+        cancelButtonText: T('Cancel'),
         type: 'warning'
       }
     )
     
     saving.value = true
     await updateSystemConfig(configForm.value)
-    ElMessage.success('配置保存成功')
+    ElMessage.success(T('ConfigSaveSuccess'))
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('保存配置失败')
+      ElMessage.error(T('ConfigSaveFailed'))
     }
   } finally {
     saving.value = false

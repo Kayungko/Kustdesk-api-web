@@ -132,47 +132,47 @@
             </el-col>
             <el-col :span="6">
               <el-statistic :title="T('OnlineDevices')" 
-                          :value="currentUserDevices.filter(d => getDeviceStatus(d).type === 'success').length" />
+                          :value="(currentUserDevices || []).filter(d => getDeviceStatus(d).type === 'success').length" />
             </el-col>
             <el-col :span="6">
               <el-statistic :title="T('ExpiredDevices')" 
-                          :value="currentUserDevices.filter(d => d.expired_at && d.expired_at < Date.now()/1000).length" />
+                          :value="(currentUserDevices || []).filter(d => d.expired_at && d.expired_at < Date.now()/1000).length" />
             </el-col>
             <el-col :span="6">
               <el-statistic :title="T('RecentlyActiveDevices')" 
-                          :value="currentUserDevices.filter(d => getDeviceStatus(d).type === 'warning').length" />
+                          :value="(currentUserDevices || []).filter(d => getDeviceStatus(d).type === 'warning').length" />
             </el-col>
           </el-row>
           
           <!-- 设备数量限制信息 -->
-          <el-row :gutter="20" style="margin-top: 20px;" v-if="deviceLimitInfo">
+          <el-row :gutter="20" style="margin-top: 20px;" v-if="deviceLimitInfo && deviceLimitInfo.limit">
             <el-col :span="6">
-              <el-statistic title="设备限制" :value="`${currentUserDevices.length}/${deviceLimitInfo.limit}`" />
+              <el-statistic :title="T('DeviceLimit')" :value="`${(currentUserDevices || []).length}/${deviceLimitInfo.limit}`" />
             </el-col>
             <el-col :span="6">
-              <el-statistic title="可用槽位" :value="Math.max(0, deviceLimitInfo.limit - currentUserDevices.length)" />
+              <el-statistic :title="T('AvailableSlots')" :value="Math.max(0, deviceLimitInfo.limit - (currentUserDevices || []).length)" />
             </el-col>
             <el-col :span="6">
-              <el-statistic title="最大允许" :value="deviceLimitInfo.limit" />
+              <el-statistic :title="T('MaxAllowed')" :value="deviceLimitInfo.limit" />
             </el-col>
             <el-col :span="6">
-              <el-statistic title="使用率" :value="`${Math.round((currentUserDevices.length / deviceLimitInfo.limit) * 100)}%`" />
+              <el-statistic :title="T('UsageRate')" :value="`${Math.round(((currentUserDevices || []).length / deviceLimitInfo.limit) * 100)}%`" />
             </el-col>
           </el-row>
           
           <!-- 设备限制类型说明 -->
-          <el-row style="margin-top: 10px;" v-if="deviceLimitInfo">
+          <el-row style="margin-top: 10px;" v-if="deviceLimitInfo && deviceLimitInfo.limit">
             <el-col :span="24">
               <el-tag 
                 :type="deviceLimitInfo.is_personal ? 'success' : 'info'"
                 size="small"
               >
-                {{ deviceLimitInfo.is_personal ? '个人限制' : '全局限制' }}
+                {{ deviceLimitInfo.is_personal ? T('PersonalLimit') : T('GlobalLimit') }}
               </el-tag>
               <span style="margin-left: 10px; font-size: 12px; color: #909399;">
                 {{ deviceLimitInfo.is_personal ? 
-                  `用户个人设置：最多 ${deviceLimitInfo.limit} 个设备` : 
-                  `系统全局设置：最多 ${deviceLimitInfo.limit} 个设备` 
+                  T('PersonalLimitTip', { limit: deviceLimitInfo.limit }) : 
+                  T('GlobalLimitTip', { limit: deviceLimitInfo.limit }) 
                 }}
               </span>
             </el-col>
@@ -180,32 +180,35 @@
           
           <!-- 设备数量超限警告 -->
           <el-alert
-            v-if="deviceLimitInfo && currentUserDevices.length >= deviceLimitInfo.limit"
-            title="设备数量已达限制"
+            v-if="deviceLimitInfo && deviceLimitInfo.limit && (currentUserDevices || []).length >= deviceLimitInfo.limit"
+            :title="T('DeviceLimitReached')"
             type="warning"
             :closable="false"
             show-icon
             style="margin-top: 20px;"
           >
             <template #default>
-              用户已达到最大设备数量限制 ({{ deviceLimitInfo.limit }}个)，新设备无法登录。
+              {{ T('DeviceLimitReachedTip', { limit: deviceLimitInfo.limit }) }}
               <el-button type="primary" size="small" style="margin-left: 10px;" @click="showDeviceLimitHelp">
-                了解更多
+                {{ T('LearnMore') }}
               </el-button>
             </template>
           </el-alert>
           
           <!-- 设备数量接近限制提醒 -->
           <el-alert
-            v-if="deviceLimitInfo && currentUserDevices.length >= deviceLimitInfo.limit * 0.8 && currentUserDevices.length < deviceLimitInfo.limit"
-            title="设备数量接近限制"
+            v-if="deviceLimitInfo && deviceLimitInfo.limit && (currentUserDevices || []).length >= deviceLimitInfo.limit * 0.8 && (currentUserDevices || []).length < deviceLimitInfo.limit"
+            :title="T('DeviceLimitNear')"
             type="info"
             :closable="false"
             show-icon
             style="margin-top: 20px;"
           >
             <template #default>
-              当前已使用 {{ currentUserDevices.length }} 个设备槽位，还剩 {{ deviceLimitInfo.limit - currentUserDevices.length }} 个可用。
+              {{ T('DeviceLimitNearTip', { 
+                current: (currentUserDevices || []).length, 
+                remaining: deviceLimitInfo.limit - (currentUserDevices || []).length 
+              }) }}
             </template>
           </el-alert>
         </div>
@@ -285,14 +288,58 @@
     currentUser.value = row
     devicesDialogVisible.value = true
     await loadUserDevices(row.id)
-    // 尝试获取设备数量限制信息
+    // 获取设备数量限制信息
+    await loadDeviceLimitInfo(row.id)
+  }
+
+  const loadDeviceLimitInfo = async (userId) => {
     try {
-      const res = await getUserDevices(row.id, true) // 第二个参数为 true 表示获取限制信息
-      if (res && res.data) {
-        deviceLimitInfo.value = res.data
+      // 从API响应获取设备限制信息
+      const res = await getUserDevices(userId)
+      if (res && res.data && res.data.device_limit) {
+        const deviceLimit = res.data.device_limit
+        const globalLimit = deviceLimit.global_limit || 3
+        const userLimit = deviceLimit.user_limit || globalLimit
+        
+        console.log('Setting deviceLimitInfo from API:', {
+          limit: userLimit,
+          is_personal: deviceLimit.user_limit ? true : false,
+          global_limit: globalLimit,
+          deviceLimit: deviceLimit
+        })
+        
+        deviceLimitInfo.value = {
+          limit: userLimit,
+          is_personal: deviceLimit.user_limit ? true : false,
+          global_limit: globalLimit
+        }
+      } else {
+        // 从系统配置获取全局限制
+        const globalLimit = 3 // 这里应该从系统配置获取，暂时硬编码
+        // 从用户设置获取个人限制
+        const userLimit = currentUser.value.max_devices || globalLimit
+        
+        console.log('Setting deviceLimitInfo from fallback:', {
+          limit: userLimit,
+          is_personal: currentUser.value.max_devices ? true : false,
+          global_limit: globalLimit,
+          currentUser: currentUser.value
+        })
+        
+        deviceLimitInfo.value = {
+          limit: userLimit,
+          is_personal: currentUser.value.max_devices ? true : false,
+          global_limit: globalLimit
+        }
       }
     } catch (error) {
       console.error('Failed to load device limit info:', error)
+      // 设置默认值
+      deviceLimitInfo.value = {
+        limit: 3,
+        is_personal: false,
+        global_limit: 3
+      }
     }
   }
 
@@ -300,11 +347,18 @@
     devicesLoading.value = true
     try {
       const res = await getUserDevices(userId)
-      if (res && res.data) {
-        currentUserDevices.value = res.data
+      console.log('getUserDevices response:', res)
+      if (res && res.data && res.data.devices) {
+        currentUserDevices.value = res.data.devices
+        console.log('currentUserDevices set to:', currentUserDevices.value)
+      } else {
+        console.log('No devices data in response, setting empty array')
+        currentUserDevices.value = []
       }
     } catch (error) {
+      console.error('Error loading user devices:', error)
       ElMessage.error(T('FailedToLoadDevices'))
+      currentUserDevices.value = []
     } finally {
       devicesLoading.value = false
     }
@@ -362,18 +416,15 @@
     const diff = now - timestamp
     
     if (diff < 60) return T('JustNow')
-    if (diff < 3600) return `${Math.floor(diff / 60)}${T('MinutesAgo')}`
-    if (diff < 86400) return `${Math.floor(diff / 3600)}${T('HoursAgo')}`
-    return `${Math.floor(diff / 86400)}${T('DaysAgo')}`
+    if (diff < 3600) return T('MinutesAgo', { param: Math.floor(diff / 60) })
+    if (diff < 86400) return T('HoursAgo', { param: Math.floor(diff / 3600) })
+    return T('DaysAgo', { param: Math.floor(diff / 86400) })
   }
 
   // 新增：显示设备数量限制帮助信息
   const showDeviceLimitHelp = () => {
     ElMessageBox.info(
-      `设备数量限制是指用户可以同时登录的设备数量。\n\n` +
-      `1. 个人限制：用户可以在个人设置中调整，最多 ${deviceLimitInfo.value?.limit || 'N/A'} 个设备。\n` +
-      `2. 全局限制：系统可以在配置文件中设置，最多 ${deviceLimitInfo.value?.limit || 'N/A'} 个设备。\n\n` +
-      `当用户达到个人限制或全局限制时，新设备将无法登录。`
+      T('DeviceLimitHelp', { limit: deviceLimitInfo.value?.limit || 'N/A' })
     )
   }
 
