@@ -131,10 +131,10 @@
 <script setup>
 import { ref, reactive, watch, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
-import { useI18n } from 'vue-i18n'
 import { createServerConfig, updateServerConfig } from '@/api/server_config'
+import { T } from '@/utils/i18n'
 
-const { t } = useI18n()
+const t = T
 
 // Props
 const props = defineProps({

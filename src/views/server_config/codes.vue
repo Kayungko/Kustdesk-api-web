@@ -209,7 +209,6 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Refresh, DocumentCopy } from '@element-plus/icons-vue'
-import { useI18n } from 'vue-i18n'
 import {
   getConfigCodeList,
   deleteConfigCode,
@@ -217,8 +216,9 @@ import {
   getServerConfigList
 } from '@/api/server_config'
 import { formatTime } from '@/utils/time'
+import { T } from '@/utils/i18n'
 
-const { t } = useI18n()
+const t = T
 
 // 响应式数据
 const loading = ref(false)

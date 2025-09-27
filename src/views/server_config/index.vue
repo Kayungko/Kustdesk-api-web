@@ -204,17 +204,17 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, ArrowDown } from '@element-plus/icons-vue'
-import { useI18n } from 'vue-i18n'
 import {
   getServerConfigList,
   deleteServerConfig,
   setDefaultServerConfig
 } from '@/api/server_config'
 import { formatTime } from '@/utils/time'
+import { T } from '@/utils/i18n'
 import ServerConfigForm from './components/ServerConfigForm.vue'
 import GenerateCodeForm from './components/GenerateCodeForm.vue'
 
-const { t } = useI18n()
+const t = T
 
 // 响应式数据
 const loading = ref(false)
