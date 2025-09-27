@@ -787,5 +787,326 @@
   },
   "Remark": {
     "One": "备注"
+  },
+  "ServerConfigManagement": {
+    "One": "服务器配置管理"
+  },
+  "ServerConfigManagementDesc": {
+    "One": "管理RustDesk服务器配置，生成客户端配置码"
+  },
+  "ConfigCodeManagement": {
+    "One": "配置码管理"
+  },
+  "ConfigCodeManagementDesc": {
+    "One": "查看和管理已生成的配置码及使用情况"
+  },
+  "CreateServerConfig": {
+    "One": "创建服务器配置"
+  },
+  "EditServerConfig": {
+    "One": "编辑服务器配置"
+  },
+  "ConfigName": {
+    "One": "配置名称"
+  },
+  "EnterConfigName": {
+    "One": "请输入配置名称"
+  },
+  "ConfigNameRequired": {
+    "One": "配置名称不能为空"
+  },
+  "ConfigNameLength": {
+    "One": "配置名称长度为1-100个字符"
+  },
+  "Description": {
+    "One": "描述"
+  },
+  "EnterDescription": {
+    "One": "请输入描述信息"
+  },
+  "DescriptionLength": {
+    "One": "描述长度不能超过500个字符"
+  },
+  "Region": {
+    "One": "地域"
+  },
+  "SelectRegion": {
+    "One": "选择地域"
+  },
+  "RegionLength": {
+    "One": "地域标识长度不能超过50个字符"
+  },
+  "ServerSettings": {
+    "One": "服务器设置"
+  },
+  "IdServer": {
+    "One": "ID服务器"
+  },
+  "EnterIdServer": {
+    "One": "请输入ID服务器地址"
+  },
+  "IdServerRequired": {
+    "One": "ID服务器地址不能为空"
+  },
+  "IdServerLength": {
+    "One": "ID服务器地址长度不能超过255个字符"
+  },
+  "IdServerTip": {
+    "One": "RustDesk ID服务器地址，用于设备注册和连接"
+  },
+  "RelayServer": {
+    "One": "中继服务器"
+  },
+  "EnterRelayServer": {
+    "One": "请输入中继服务器地址"
+  },
+  "RelayServerLength": {
+    "One": "中继服务器地址长度不能超过255个字符"
+  },
+  "RelayServerTip": {
+    "One": "RustDesk中继服务器地址，用于网络穿透"
+  },
+  "ApiServer": {
+    "One": "API服务器"
+  },
+  "EnterApiServer": {
+    "One": "请输入API服务器地址"
+  },
+  "ApiServerLength": {
+    "One": "API服务器地址长度不能超过255个字符"
+  },
+  "ApiServerFormat": {
+    "One": "API服务器地址必须以http://或https://开头"
+  },
+  "ApiServerTip": {
+    "One": "RustDesk API服务器地址，用于用户认证和配置同步"
+  },
+  "ServerKey": {
+    "One": "服务器密钥"
+  },
+  "EnterServerKey": {
+    "One": "请输入服务器密钥"
+  },
+  "ServerKeyLength": {
+    "One": "服务器密钥长度不能超过500个字符"
+  },
+  "ServerKeyTip": {
+    "One": "服务器公钥，用于客户端验证服务器身份"
+  },
+  "ConfigSettings": {
+    "One": "配置设置"
+  },
+  "Priority": {
+    "One": "优先级"
+  },
+  "PriorityTip": {
+    "One": "数字越大优先级越高，客户端会优先使用高优先级配置"
+  },
+  "PriorityRange": {
+    "One": "优先级范围为0-9999"
+  },
+  "SetAsDefault": {
+    "One": "设为默认配置"
+  },
+  "DefaultConfigTip": {
+    "One": "默认配置将作为新生成配置码的首选配置"
+  },
+  "ServerInfo": {
+    "One": "服务器信息"
+  },
+  "GenerateCode": {
+    "One": "生成配置码"
+  },
+  "More": {
+    "One": "更多"
+  },
+  "Edit": {
+    "One": "编辑"
+  },
+  "Delete": {
+    "One": "删除"
+  },
+  "Default": {
+    "One": "默认"
+  },
+  "Enabled": {
+    "One": "启用"
+  },
+  "Disabled": {
+    "One": "禁用"
+  },
+  "ConfirmSetDefaultConfig": {
+    "One": "确认将此配置设为默认配置吗？"
+  },
+  "SetDefaultSuccess": {
+    "One": "设置默认配置成功"
+  },
+  "SetDefaultFailed": {
+    "One": "设置默认配置失败"
+  },
+  "ConfirmDeleteConfig": {
+    "One": "确认删除此服务器配置吗？删除后关联的配置码将无法使用。"
+  },
+  "DeleteSuccess": {
+    "One": "删除成功"
+  },
+  "DeleteFailed": {
+    "One": "删除失败"
+  },
+  "CreateSuccess": {
+    "One": "创建成功"
+  },
+  "UpdateSuccess": {
+    "One": "更新成功"
+  },
+  "OperationSuccess": {
+    "One": "操作成功"
+  },
+  "OperationFailed": {
+    "One": "操作失败"
+  },
+  "LoadDataFailed": {
+    "One": "加载数据失败"
+  },
+  "SelectedServerConfig": {
+    "One": "选择的服务器配置"
+  },
+  "GenerationType": {
+    "One": "生成类型"
+  },
+  "SingleCode": {
+    "One": "单个配置码"
+  },
+  "BatchCodes": {
+    "One": "批量配置码"
+  },
+  "GenerateCount": {
+    "One": "生成数量"
+  },
+  "GenerateCountRequired": {
+    "One": "生成数量不能为空"
+  },
+  "GenerateCountRange": {
+    "One": "生成数量范围为1-100"
+  },
+  "BatchCountTip": {
+    "One": "一次最多可生成100个配置码"
+  },
+  "ExpirationTime": {
+    "One": "过期时间"
+  },
+  "SelectExpirationTime": {
+    "One": "选择过期时间"
+  },
+  "ExpirationTimeTip": {
+    "One": "留空表示永不过期"
+  },
+  "UsageLimit": {
+    "One": "使用次数限制"
+  },
+  "UnlimitedUsage": {
+    "One": "不限制"
+  },
+  "UsageLimitTip": {
+    "One": "留空表示不限制使用次数"
+  },
+  "BatchGenerate": {
+    "One": "批量生成"
+  },
+  "GeneratedCodes": {
+    "One": "生成的配置码"
+  },
+  "CopyAllCodes": {
+    "One": "复制全部"
+  },
+  "DownloadCodes": {
+    "One": "下载配置码"
+  },
+  "Copy": {
+    "One": "复制"
+  },
+  "CopySuccess": {
+    "One": "复制成功"
+  },
+  "CopyAllSuccess": {
+    "One": "复制全部配置码成功"
+  },
+  "DownloadSuccess": {
+    "One": "下载成功"
+  },
+  "GenerateSuccess": {
+    "One": "生成成功"
+  },
+  "GenerateFailed": {
+    "One": "生成失败"
+  },
+  "GenerateSummary": {
+    "One": "已生成 {count} 个配置码，{expiry}，{usage}"
+  },
+  "ExpiresAt": {
+    "One": "过期时间：{time}"
+  },
+  "NeverExpires": {
+    "One": "永不过期"
+  },
+  "MaxUsage": {
+    "One": "最大使用次数：{count}"
+  },
+  "TotalCodes": {
+    "One": "总配置码"
+  },
+  "ActiveCodes": {
+    "One": "活跃配置码"
+  },
+  "ExpiredCodes": {
+    "One": "过期配置码"
+  },
+  "TotalUsage": {
+    "One": "总使用次数"
+  },
+  "SearchConfigCode": {
+    "One": "搜索配置码"
+  },
+  "SelectServerConfig": {
+    "One": "选择服务器配置"
+  },
+  "RefreshStats": {
+    "One": "刷新统计"
+  },
+  "ConfigCode": {
+    "One": "配置码"
+  },
+  "ServerConfig": {
+    "One": "服务器配置"
+  },
+  "Usage": {
+    "One": "使用情况"
+  },
+  "Status": {
+    "One": "状态"
+  },
+  "Creator": {
+    "One": "创建者"
+  },
+  "CreatedAt": {
+    "One": "创建时间"
+  },
+  "Active": {
+    "One": "活跃"
+  },
+  "Expired": {
+    "One": "已过期"
+  },
+  "ExceededLimit": {
+    "One": "超出限制"
+  },
+  "ConfirmDeleteConfigCode": {
+    "One": "确认删除此配置码吗？"
+  },
+  "SearchConfigName": {
+    "One": "搜索配置名称"
+  },
+  "SelectStatus": {
+    "One": "选择状态"
   }
 }

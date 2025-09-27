@@ -203,6 +203,18 @@ export const asyncRoutes = [
         component: () => import('@/views/rustdesk/control.vue'),
       },
       {
+        path: '/serverConfig',
+        name: 'ServerConfig',
+        meta: { title: 'ServerConfigManagement', icon: 'CloudService' /*keepAlive: true*/ },
+        component: () => import('@/views/server_config/index.vue'),
+      },
+      {
+        path: '/configCodes',
+        name: 'ConfigCodes',
+        meta: { title: 'ConfigCodeManagement', icon: 'Key' /*keepAlive: true*/ },
+        component: () => import('@/views/server_config/codes.vue'),
+      },
+      {
         path: '/systemConfig',
         name: 'SystemConfig',
         meta: { title: 'SystemConfig', icon: 'Setting' /*keepAlive: true*/ },
