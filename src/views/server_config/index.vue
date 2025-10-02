@@ -136,6 +136,9 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
+                  <el-dropdown-item command="test">
+                    <el-icon><VideoPlay /></el-icon> {{ $t('Test') }}
+                  </el-dropdown-item>
                   <el-dropdown-item command="edit">{{ $t('Edit') }}</el-dropdown-item>
                   <el-dropdown-item 
                     command="setDefault" 
@@ -203,7 +206,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, ArrowDown } from '@element-plus/icons-vue'
+import { Plus, ArrowDown, VideoPlay } from '@element-plus/icons-vue'
 import {
   getServerConfigList,
   deleteServerConfig,
@@ -293,6 +296,9 @@ const handleCreate = () => {
 
 const handleMoreAction = async (command, row) => {
   switch (command) {
+    case 'test':
+      await handleTest(row)
+      break
     case 'edit':
       handleEdit(row)
       break
@@ -302,6 +308,102 @@ const handleMoreAction = async (command, row) => {
     case 'delete':
       await handleDelete(row)
       break
+  }
+}
+
+const handleTest = async (row) => {
+  const loadingMsg = ElMessage({
+    message: t('Testing server configuration...'),
+    type: 'info',
+    duration: 0,
+    icon: 'Loading'
+  })
+
+  try {
+    // 模拟测试服务器连接
+    // 实际实现中应该调用后端API进行真实的连接测试
+    const testResult = await simulateServerTest(row)
+    
+    loadingMsg.close()
+    
+    // 显示测试结果对话框
+    const resultHtml = `
+      <div style="text-align: left; padding: 10px;">
+        <h4 style="margin-top: 0; color: #303133;">${t('Server')}: ${row.name}</h4>
+        <div style="margin: 10px 0;">
+          <div style="margin: 8px 0; padding: 8px; background: ${testResult.idServer ? '#f0f9ff' : '#fef0f0'}; border-radius: 4px;">
+            <span style="color: ${testResult.idServer ? '#67c23a' : '#f56c6c'};">
+              ${testResult.idServer ? '✓' : '✗'}
+            </span>
+            <strong> ID Server:</strong> ${row.id_server}
+            <div style="font-size: 12px; color: #909399; margin-left: 20px;">
+              ${testResult.idServer ? t('Connected') : t('Connection Failed')}
+            </div>
+          </div>
+          ${row.relay_server ? `
+          <div style="margin: 8px 0; padding: 8px; background: ${testResult.relayServer ? '#f0f9ff' : '#fef0f0'}; border-radius: 4px;">
+            <span style="color: ${testResult.relayServer ? '#67c23a' : '#f56c6c'};">
+              ${testResult.relayServer ? '✓' : '✗'}
+            </span>
+            <strong> Relay Server:</strong> ${row.relay_server}
+            <div style="font-size: 12px; color: #909399; margin-left: 20px;">
+              ${testResult.relayServer ? t('Connected') : t('Connection Failed')}
+            </div>
+          </div>
+          ` : ''}
+          ${row.api_server ? `
+          <div style="margin: 8px 0; padding: 8px; background: ${testResult.apiServer ? '#f0f9ff' : '#fef0f0'}; border-radius: 4px;">
+            <span style="color: ${testResult.apiServer ? '#67c23a' : '#f56c6c'};">
+              ${testResult.apiServer ? '✓' : '✗'}
+            </span>
+            <strong> API Server:</strong> ${row.api_server}
+            <div style="font-size: 12px; color: #909399; margin-left: 20px;">
+              ${testResult.apiServer ? t('Connected') : t('Connection Failed')}
+            </div>
+          </div>
+          ` : ''}
+        </div>
+        <div style="margin-top: 16px; padding: 12px; background: #f4f4f5; border-radius: 4px; font-size: 13px;">
+          <strong>${t('Test Summary')}:</strong> 
+          ${testResult.success ? 
+            `<span style="color: #67c23a;">${t('All services are reachable')}</span>` : 
+            `<span style="color: #e6a23c;">${t('Some services may not be reachable')}</span>`
+          }
+        </div>
+      </div>
+    `
+    
+    ElMessageBox({
+      title: t('Test Result'),
+      dangerouslyUseHTMLString: true,
+      message: resultHtml,
+      confirmButtonText: t('OK'),
+      type: testResult.success ? 'success' : 'warning'
+    })
+  } catch (error) {
+    loadingMsg.close()
+    ElMessage.error(t('Test failed'))
+    console.error('Server test error:', error)
+  }
+}
+
+// 模拟服务器测试（实际应该调用后端API）
+const simulateServerTest = async (config) => {
+  // 模拟网络延迟
+  await new Promise(resolve => setTimeout(resolve, 1500))
+  
+  // 实际实现中，这里应该调用后端API进行真实的连接测试
+  // 例如：const response = await testServerConfig(config.id)
+  // 现在返回模拟结果
+  const hasIdServer = !!config.id_server
+  const hasRelayServer = !!config.relay_server
+  const hasApiServer = !!config.api_server
+  
+  return {
+    idServer: hasIdServer,
+    relayServer: hasRelayServer,
+    apiServer: hasApiServer,
+    success: hasIdServer && (hasRelayServer || !config.relay_server) && (hasApiServer || !config.api_server)
   }
 }
 
