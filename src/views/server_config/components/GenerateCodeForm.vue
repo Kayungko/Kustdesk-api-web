@@ -121,15 +121,66 @@
           :closable="false"
         />
       </div>
+
+      <!-- 分享方式 -->
+      <el-divider />
+      <h4>{{ $t('ShareMethods') }}</h4>
+      <div class="share-section">
+        <div class="share-buttons">
+          <el-button @click="shareViaEmail" :icon="Message">
+            {{ $t('SendByEmail') }}
+          </el-button>
+          <el-button @click="shareViaQR" :icon="QrCode">
+            {{ $t('ShowQRCode') }}
+          </el-button>
+          <el-button @click="printCodes" :icon="Printer">
+            {{ $t('PrintCodes') }}
+          </el-button>
+        </div>
+      </div>
+
+      <!-- 安全提示 -->
+      <div class="security-tips">
+        <el-alert
+          type="warning"
+          :closable="false"
+          show-icon
+        >
+          <template #title>
+            <strong>{{ $t('SecurityTips') }}</strong>
+          </template>
+          <ul class="tips-list">
+            <li>{{ $t('CodeOnlyContainsServerInfo') }}</li>
+            <li>{{ $t('SendViaSafeChannel') }}</li>
+            <li>{{ $t('UserNeedsToLogin') }}</li>
+          </ul>
+        </el-alert>
+      </div>
     </div>
+
+    <!-- 二维码对话框 -->
+    <el-dialog
+      v-model="qrDialogVisible"
+      :title="$t('ConfigCodeQRCode')"
+      width="400px"
+    >
+      <div class="qr-code-container">
+        <div ref="qrCodeRef" class="qr-code"></div>
+        <div class="qr-tip">
+          {{ $t('ScanQRCodeToGetConfig') }}
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, reactive, computed, watch, nextTick } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Message, QrCode, Printer } from '@element-plus/icons-vue'
 import { generateConfigCode, batchGenerateConfigCode } from '@/api/server_config'
 import { T } from '@/utils/i18n'
+import QRCode from 'qrcode'
 
 const t = T
 
@@ -149,6 +200,8 @@ const formRef = ref(null)
 const generating = ref(false)
 const generateType = ref('single')
 const generatedCodes = ref([])
+const qrDialogVisible = ref(false)
+const qrCodeRef = ref(null)
 
 const form = reactive({
   count: 10,
@@ -272,6 +325,149 @@ const downloadCodes = () => {
   
   ElMessage.success(t('DownloadSuccess'))
 }
+
+// 邮件分享
+const shareViaEmail = () => {
+  if (generatedCodes.value.length === 0) return
+  
+  const codes = generatedCodes.value.map(item => item.code).join('\n')
+  const subject = `RustDesk ${t('ConfigCode')} - ${props.serverConfig.name}`
+  const body = `${t('ServerConfig')}: ${props.serverConfig.name}\n\n${t('ConfigCodes')}:\n${codes}\n\n${t('Expiry')}: ${form.expires_at || t('NeverExpires')}\n${t('MaxUsage')}: ${form.max_usage || t('Unlimited')}\n\n${t('SecurityTips')}:\n- ${t('CodeOnlyContainsServerInfo')}\n- ${t('UserNeedsToLogin')}`
+  
+  const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  window.location.href = mailtoLink
+}
+
+// 显示二维码
+const shareViaQR = async () => {
+  if (generatedCodes.value.length === 0) return
+  
+  qrDialogVisible.value = true
+  
+  await nextTick()
+  
+  try {
+    // 如果有多个配置码，显示第一个
+    const code = generatedCodes.value[0].code
+    
+    // 清空之前的二维码
+    if (qrCodeRef.value) {
+      qrCodeRef.value.innerHTML = ''
+      
+      // 生成新的二维码
+      const canvas = document.createElement('canvas')
+      qrCodeRef.value.appendChild(canvas)
+      
+      await QRCode.toCanvas(canvas, code, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        }
+      })
+    }
+  } catch (error) {
+    console.error('QR Code generation error:', error)
+    ElMessage.error(t('QRCodeGenerationFailed'))
+  }
+}
+
+// 打印配置码
+const printCodes = () => {
+  if (generatedCodes.value.length === 0) return
+  
+  const printWindow = window.open('', '_blank')
+  const content = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>${t('ConfigCodes')} - ${props.serverConfig.name}</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          padding: 40px;
+          line-height: 1.6;
+        }
+        h1 {
+          color: #333;
+          border-bottom: 2px solid #2C8CFF;
+          padding-bottom: 10px;
+        }
+        .info {
+          background: #f5f7fa;
+          padding: 15px;
+          border-radius: 5px;
+          margin: 20px 0;
+        }
+        .info p {
+          margin: 5px 0;
+        }
+        .code-list {
+          margin: 20px 0;
+        }
+        .code-item {
+          background: #fff;
+          border: 1px solid #ddd;
+          padding: 15px;
+          margin: 10px 0;
+          border-radius: 5px;
+          word-break: break-all;
+          font-family: 'Courier New', monospace;
+        }
+        .footer {
+          margin-top: 40px;
+          padding-top: 20px;
+          border-top: 1px solid #ddd;
+          color: #666;
+          font-size: 12px;
+        }
+        @media print {
+          .no-print { display: none; }
+        }
+      </style>
+    </head>
+    <body>
+      <h1>${t('RustDesk')} ${t('ConfigCodes')}</h1>
+      
+      <div class="info">
+        <p><strong>${t('ServerConfig')}:</strong> ${props.serverConfig.name}</p>
+        <p><strong>${t('GeneratedTime')}:</strong> ${new Date().toLocaleString()}</p>
+        <p><strong>${t('Expiry')}:</strong> ${form.expires_at || t('NeverExpires')}</p>
+        <p><strong>${t('MaxUsage')}:</strong> ${form.max_usage || t('Unlimited')}</p>
+      </div>
+      
+      <div class="code-list">
+        <h3>${t('ConfigCodes')}:</h3>
+        ${generatedCodes.value.map((item, index) => `
+          <div class="code-item">
+            <strong>${index + 1}.</strong> ${item.code}
+          </div>
+        `).join('')}
+      </div>
+      
+      <div class="footer">
+        <p><strong>${t('SecurityTips')}:</strong></p>
+        <ul>
+          <li>${t('CodeOnlyContainsServerInfo')}</li>
+          <li>${t('SendViaSafeChannel')}</li>
+          <li>${t('UserNeedsToLogin')}</li>
+        </ul>
+        <p>${t('GeneratedBy')}: ${props.serverConfig.name} | ${new Date().toLocaleString()}</p>
+      </div>
+      
+      <script>
+        window.onload = function() {
+          window.print();
+        }
+      </script>
+    </body>
+    </html>
+  `
+  
+  printWindow.document.write(content)
+  printWindow.document.close()
+}
 </script>
 
 <style lang="scss" scoped>
@@ -381,12 +577,62 @@ const downloadCodes = () => {
       }
     }
 
-    .result-summary {
-      :deep(.el-alert__description) {
-        font-size: 13px;
+  .result-summary {
+    :deep(.el-alert__description) {
+      font-size: 13px;
+      line-height: 1.5;
+    }
+  }
+
+  .share-section {
+    margin: 16px 0;
+
+    .share-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      .el-button {
+        flex: 1;
+        min-width: 120px;
+      }
+    }
+  }
+
+  .security-tips {
+    margin-top: 16px;
+
+    .tips-list {
+      margin: 8px 0 0 0;
+      padding-left: 20px;
+      
+      li {
+        margin: 4px 0;
         line-height: 1.5;
       }
     }
   }
+}
+
+.qr-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+
+  .qr-code {
+    margin-bottom: 16px;
+    
+    canvas {
+      display: block;
+    }
+  }
+
+  .qr-tip {
+    text-align: center;
+    color: #606266;
+    font-size: 14px;
+  }
+}
 }
 </style>
